@@ -1,6 +1,5 @@
 import React from 'react';
 import './App.css';
-import Counter from './features/counter/Counter';
 import PostsList from './features/posts/PostsList';
 import AddPostForm from './features/posts/AddPostForm';
 import EditPostForm from './features/posts/EditPostForm';

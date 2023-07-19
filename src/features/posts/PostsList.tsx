@@ -1,28 +1,34 @@
-import React from 'react'
-import { useSelector } from 'react-redux';
-import { selectAllPosts, getPostsStatus, getPostsError } from './postsSlice';
-import PostExcerpt from './PostExcerpt';
+import { useSelector } from "react-redux";
+import { selectPostIds } from "./postsSlice";
+import PostExcerpt from "./PostExcerpt";
+import { useGetPostsQuery } from './postsSlice';
 
 const PostsList = () => {
-    const posts = useSelector(selectAllPosts);
-    const postsStatus = useSelector(getPostsStatus);
-    const error = useSelector(getPostsError);
+    const {
+        isLoading,
+        isSuccess,
+        isError,
+        error
+    } = useGetPostsQuery('')
+
+    const orderedPostIds = useSelector(selectPostIds)
 
     let content;
-    if (postsStatus === 'loading') {
+    if (isLoading) {
         content = <p>"Loading..."</p>;
-    } else if (postsStatus === 'succeeded') {
-        const orderedPosts = posts.slice().sort((a:any,b:any) => b.date.localeCompare(a.date))
-        content = orderedPosts.map((post:any, index:number) => <PostExcerpt key={ index } post={post}/>)
-    } else if (postsStatus === 'failed') {
-        content = <p>{ error }</p>;
+    }  else if (isSuccess) {
+        content = orderedPostIds.map((postId) => <PostExcerpt key={postId} postId={postId} />)
+    } else if (isError) {
+        content = <p>{error as any}</p>;
     }
 
     return (
-        <section>
-            { content }
-        </section>
+        <>
+            <section>
+                {content}
+            </section>
+        </>
+        
     )
 }
-
 export default PostsList

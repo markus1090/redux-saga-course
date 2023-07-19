@@ -1,26 +1,26 @@
 import React, { ChangeEvent, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
-import { addNewPost } from './postsSlice';
 import { selectAllUsers } from '../users/usersSlice';
 import { useNavigate } from 'react-router-dom';
+import { useAddNewPostMutation } from './postsSlice';
 
 const AddPostForm = () => {
+    const [addNewPost, { isLoading }] = useAddNewPostMutation();
+
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [userId, setUserId] = useState('');
-    const [addRequestStatus, setAddRequestStatus] = useState('idle');
 
     const users = useSelector(selectAllUsers);
 
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const onTitleChanged = (e:ChangeEvent<HTMLInputElement>) => setTitle(e.target.value);
     const onContentChanged = (e:ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value);
     const onAuthorChanged = (e:ChangeEvent<HTMLSelectElement>) => setUserId(e.target.value);
 
-    const canSave = [ title, content, userId ].every(Boolean) && addRequestStatus === 'idle';
+    const canSave = [ title, content, userId ].every(Boolean) && !isLoading;
 
     const userOptions = users.map(user => (
         <option key={ user.id } value={ user.id }>
@@ -28,22 +28,18 @@ const AddPostForm = () => {
         </option>
     ))
 
-    const onSavePostClicked = () => {
+    const onSavePostClicked = async () => {
         if (canSave) {
             try {
-                setAddRequestStatus('pending')
-                dispatch<any>(addNewPost({ title, body: content, userId })).unwrap()
+                await addNewPost({ title, body: content, userId }).unwrap();
                 setTitle('')
                 setContent('')
                 setUserId('')
                 navigate('/')
             } catch (err) {
                 console.error('Failed to save the post', err)
-            } finally {
-                setAddRequestStatus('idle')
             }
         }
-
     }
 
     return (

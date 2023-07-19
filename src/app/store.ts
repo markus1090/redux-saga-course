@@ -1,16 +1,14 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import counterReducer from '../features/counter/counterSlice';
-import postsReducer from '../features/posts/postsSlice';
-import userReducer from '../features/users/usersSlice';
+import { apiSlice } from "../features/api/apiSlice";
 
 const rootReducer = combineReducers({
-    counter: counterReducer,
-    posts: postsReducer,
-    users: userReducer
+    [apiSlice.reducerPath]: apiSlice.reducer
 })
 
 export const store = configureStore({
-    reducer: rootReducer
+    reducer: rootReducer,
+    middleware: getDefaultMiddleware =>
+        getDefaultMiddleware().concat(apiSlice.middleware)
 })
 
 export type RootState = ReturnType<typeof rootReducer>;
