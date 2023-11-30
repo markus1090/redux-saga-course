@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux'
-import { selectAllUsers, useGetUsersQuery } from './usersSlice'
+import { selectAllUsers, useGetUsersQuery } from '../../features/users/usersSlice'
 import { Link } from 'react-router-dom'
 
 const UsersList = () => {
@@ -18,7 +18,7 @@ const UsersList = () => {
     } else if (isSuccess) {
         content = orderedPostIds.map((user:any) => (
             <li key={user.id}>
-                <Link to={`/user/${user.id}`}>{user.name}</Link>
+                <Link to={`/private/users/${user.id}`}>{user.name}</Link>
             </li>
         ))
     } else if (isError) {

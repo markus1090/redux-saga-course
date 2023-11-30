@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { selectPostById } from './postsSlice'
+import { selectPostById } from '../../features/posts/postsSlice'
 import { useParams, useNavigate } from 'react-router-dom'
 
-import { selectAllUsers } from "../users/usersSlice";
-import { useUpdatePostMutation, useDeletePostMutation } from './postsSlice';
+import { selectAllUsers } from "../../features/users/usersSlice";
+import { useUpdatePostMutation, useDeletePostMutation } from '../../features/posts/postsSlice';
+import { RootState } from '../../app/store';
 
 const EditPostForm = () => {
     const { postId } = useParams()
@@ -13,14 +14,15 @@ const EditPostForm = () => {
     const [updatePost, { isLoading }] = useUpdatePostMutation();
     const [deletePost] = useDeletePostMutation();
 
-    const post = useSelector((state) => selectPostById(state as any, Number(postId)))
+    const post = useSelector((state:RootState) => selectPostById(state, Number(postId)))
     const users = useSelector(selectAllUsers)
 
-    const [title, setTitle] = useState(post?.title)
-    const [content, setContent] = useState(post?.body)
-    const [userId, setUserId] = useState(post?.userId)
+    const [title, setTitle] = useState(post?.title || '')
+    const [content, setContent] = useState(post?.body || '')
+    const [userId, setUserId] = useState(post?.userId || 0)
 
     if (!post) {
+        console.log(postId)
         return (
             <section>
                 <h2>Post not found!</h2>
@@ -28,9 +30,9 @@ const EditPostForm = () => {
         )
     }
 
-    const onTitleChanged = (e:any) => setTitle(e.target.value)
-    const onContentChanged = (e:any) => setContent(e.target.value)
-    const onAuthorChanged = (e:any) => setUserId(Number(e.target.value))
+    const onTitleChanged = (e: ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)
+    const onContentChanged = (e: ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value)
+    const onAuthorChanged = (e: ChangeEvent<HTMLSelectElement>) => setUserId(Number(e.target.value))
 
     const canSave = [title, content, userId].every(Boolean) && !isLoading;
 
@@ -38,11 +40,10 @@ const EditPostForm = () => {
         if (canSave) {
             try {
                 await updatePost({ id: post.id, title, body: content, userId }).unwrap();
-
                 setTitle('')
                 setContent('')
-                setUserId('')
-                navigate(`/post/${postId}`)
+                setUserId(Number(''))
+                navigate(`/private/posts/${postId}`)
             } catch (err) {
                 console.error('Failed to save the post', err)
             }
@@ -61,8 +62,8 @@ const EditPostForm = () => {
             await deletePost({ id: post.id }).unwrap();
             setTitle('')
             setContent('')
-            setUserId('')
-            navigate('/')
+            setUserId(Number(''))
+            navigate('/private')
         } catch (err) {
             console.error('Failed to delete the post', err)
         }

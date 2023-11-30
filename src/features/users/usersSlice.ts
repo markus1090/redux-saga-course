@@ -3,14 +3,11 @@ import {
     createEntityAdapter
 } from "@reduxjs/toolkit";
 import { apiSlice } from "../api/apiSlice";
-
-export interface User {
-    id: string,
-    name: string
-}
+import { User } from "../../models/User";
+import { RootState } from "../../app/store";
 
 const usersAdapter = createEntityAdapter({
-    sortComparer: (a:any, b:any) => b.name.localeCompare(a.name)
+    sortComparer: (a:User, b:User) => b.name.localeCompare(a.name)
 })
 
 const initialState = usersAdapter.getInitialState();
@@ -19,9 +16,9 @@ export const extendedApiUserSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getUsers: builder.query({
             query: () => '/users',
-            transformResponse: (responseData: any) => {
+            transformResponse: (responseData: User[]) => {
                 console.log(responseData)
-                const loadedUsers = responseData.map((user:any) => {
+                const loadedUsers = responseData.map((user:User) => {
                     return user;
                 });
                 return usersAdapter.setAll(initialState, loadedUsers)
@@ -44,4 +41,4 @@ export const {
     selectById: selectUserById,
     selectIds: selectUserIds
     // Pass in a selector that returns the posts slice of state
-} = usersAdapter.getSelectors((state:any) => selectUsersData(state) ?? initialState)
+} = usersAdapter.getSelectors((state:RootState) => selectUsersData(state) ?? initialState)

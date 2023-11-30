@@ -1,5 +1,5 @@
 import React from 'react'
-import { useAddReactionMutation } from './postsSlice'
+import { useAddReactionMutation } from '../../features/posts/postsSlice'
 
 const reactionEmoji:any = {
     thumbsUp: '👍',

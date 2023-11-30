@@ -1,16 +1,16 @@
 import React, { ChangeEvent, useState } from 'react'
 import { useSelector } from 'react-redux';
 
-import { selectAllUsers } from '../users/usersSlice';
+import { selectAllUsers } from '../../features/users/usersSlice';
 import { useNavigate } from 'react-router-dom';
-import { useAddNewPostMutation } from './postsSlice';
+import { useAddNewPostMutation } from '../../features/posts/postsSlice';
 
 const AddPostForm = () => {
     const [addNewPost, { isLoading }] = useAddNewPostMutation();
 
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [userId, setUserId] = useState('');
+    const [userId, setUserId] = useState(0);
 
     const users = useSelector(selectAllUsers);
 
@@ -18,7 +18,7 @@ const AddPostForm = () => {
 
     const onTitleChanged = (e:ChangeEvent<HTMLInputElement>) => setTitle(e.target.value);
     const onContentChanged = (e:ChangeEvent<HTMLTextAreaElement>) => setContent(e.target.value);
-    const onAuthorChanged = (e:ChangeEvent<HTMLSelectElement>) => setUserId(e.target.value);
+    const onAuthorChanged = (e:ChangeEvent<HTMLSelectElement>) => setUserId(Number(e.target.value));
 
     const canSave = [ title, content, userId ].every(Boolean) && !isLoading;
 
@@ -34,8 +34,8 @@ const AddPostForm = () => {
                 await addNewPost({ title, body: content, userId }).unwrap();
                 setTitle('')
                 setContent('')
-                setUserId('')
-                navigate('/')
+                setUserId(Number(''))
+                navigate('/private')
             } catch (err) {
                 console.error('Failed to save the post', err)
             }

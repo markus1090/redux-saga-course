@@ -1,11 +1,12 @@
 import { useSelector } from 'react-redux'
-import { selectUserById } from '../users/usersSlice'
+import { selectUserById } from '../../features/users/usersSlice'
 import { Link, useParams } from 'react-router-dom'
-import { useGetPostsByUserIdQuery } from '../posts/postsSlice'
+import { useGetPostsByUserIdQuery } from '../../features/posts/postsSlice'
+import { RootState } from '../../app/store'
 
 const UserPage = () => {
     const { userId } = useParams()
-    const user = useSelector(state => selectUserById(state, Number(userId)))
+    const user = useSelector((state:RootState) => selectUserById(state, Number(userId)))
 
     const {
         data: postsForUser,
@@ -22,7 +23,7 @@ const UserPage = () => {
         const { ids, entities } = postsForUser;
         content = ids.map((id:any) => (
             <li key={id}>
-                <Link to={`/post/${id}`}>{ entities[id].title }</Link>
+                <Link to={`/private/posts/${id}`}>{ entities[id]!.title }</Link>
             </li>
         ))
     } else if(isError) {
